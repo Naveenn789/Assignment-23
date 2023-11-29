@@ -1,126 +1,127 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-
-namespace Assignment_23
+namespace Assignment_Day18
 {
-    public delegate void SpinDelegate(ref int energyLevel, ref int winningProbability);
-
-    class LuckySpinGame
+    public class Game
     {
-
-
-        static void Spin(ref int energyLevel, ref int winningProbability)
+        int PlayerCount, EnergyLevel = 1, WinningProbability = 100;
+        string[] PlayerNames;
+        List<int> EnergyList = new List<int>();
+        List<int> ProbabilityList = new List<int>();
+        public void Players()
         {
-            
-            if (energyLevel < 0)
-            {
-                // Ensure energy level does not go below 0
-                energyLevel = 0;
-            }
+            Console.Write("Enter number of players: ");
+            PlayerCount = Convert.ToInt32(Console.ReadLine());
 
-            if (winningProbability < 0)
-            {
-                // Ensure winning probability does not go below 0
-                winningProbability = 0;
-            }
+            PlayerNames = new string[PlayerCount];
 
-            // Define spin rules
-            switch (energyLevel)
+            for (int i = 0; i < PlayerCount; i++)
+            {
+                Console.Write($"You are Player {i + 1}: \nEnter your name: ");
+                PlayerNames[i] = Console.ReadLine();
+            }
+            Spins();
+        }
+        public void Spins()
+        {
+            for (int i = 1; i < 6; i++)
+            {
+                for (int j = 0; j < PlayerCount; j++)
+                {
+                    Console.Write($"Hi, {PlayerNames[j]}! This is your Spin {i}.\nEnter your lucky number between 1 to 10: ");
+                    int LuckyNumber = Convert.ToInt32(Console.ReadLine());
+                    Score(LuckyNumber);
+                    EnergyList.Insert(j, EnergyLevel);
+                    ProbabilityList.Insert(j, WinningProbability);
+                }
+            }
+            CheckWinner();
+        }
+
+        public void Score(int Input)
+        {
+            switch (Input)
             {
                 case 1:
-                    energyLevel += 1;
-                    winningProbability += 10;
+                    EnergyLevel += 1;
+                    WinningProbability += 10;
                     break;
-
                 case 2:
-                    energyLevel += 2;
-                    winningProbability += 20;
+                    EnergyLevel += 2;
+                    WinningProbability += 20;
                     break;
-
                 case 3:
-                    energyLevel -= 3;
-                    winningProbability -= 30;
+                    EnergyLevel -= 3;
+                    WinningProbability -= 30;
                     break;
-
                 case 4:
-                    energyLevel += 4;
-                    winningProbability += 40;
+                    EnergyLevel += 4;
+                    WinningProbability += 40;
                     break;
-
                 case 5:
-                    energyLevel += 5;
-                    winningProbability += 50;
+                    EnergyLevel += 5;
+                    WinningProbability += 50;
                     break;
-
                 case 6:
-                    energyLevel -= 1;
-                    winningProbability -= 60;
+                    EnergyLevel -= 1;
+                    WinningProbability -= 60;
                     break;
-
                 case 7:
-                    energyLevel += 1;
-                    winningProbability += 70;
+                    EnergyLevel += 1;
+                    WinningProbability += 70;
                     break;
-
                 case 8:
-                    energyLevel -= 2;
-                    winningProbability -= 20;
+                    EnergyLevel -= 2;
+                    WinningProbability -= 20;
                     break;
-
                 case 9:
-                    energyLevel -= 3;
-                    winningProbability -= 30;
+                    EnergyLevel -= 3;
+                    WinningProbability -= 30;
                     break;
-
                 case 10:
-                    energyLevel += 10;
-                    winningProbability += 100;
+                    EnergyLevel += 10;
+                    WinningProbability += 100;
                     break;
-
-
+                default:
+                    Console.WriteLine("Error! Please enter a number from 1 to 10");
+                    break;
             }
         }
-        static void Main()
+
+        public void CheckWinner()
         {
-            Console.WriteLine("Enter Your Name:");
-            string playerName = Console.ReadLine();
-
-            Console.WriteLine("Enter Your Lucky Number from 1 to 10:");
-            int luckyNumber;
-            while (!int.TryParse(Console.ReadLine(), out luckyNumber) || luckyNumber < 1 || luckyNumber > 10)
+            for (int i = 0; i < PlayerCount; i++)
             {
-                Console.WriteLine("Invalid input. Please enter a number between 1 and 10.");
+                if (EnergyList[i] >= 4 && ProbabilityList[i] > 60)
+                {
+                    Console.WriteLine($"Congratulations {PlayerNames[i]}!!! You are the winner.");
+                }
+                else if (EnergyList[i] >= 1 && ProbabilityList[i] > 50)
+                {
+                    Console.WriteLine($"Well done {PlayerNames[i]}!!! You are the runner up.");
+                }
+                else
+                {
+                    Console.WriteLine(EnergyList[i] + "," + ProbabilityList[i]);
+                    Console.WriteLine($"Sorry {PlayerNames[i]}!!! You lose the game.");
+                }
             }
+        }
 
-            int energyLevel = 1;
-            int winningProbability = 100;
-            int numberOfSpins = 5;
-
-            SpinDelegate spinDelegate = Spin;
-
-            for (int spinNumber = 1; spinNumber <= numberOfSpins; spinNumber++)
+        internal delegate void GameProbability();
+        internal class Program
+        {
+            static void Main(string[] args)
             {
-                Console.WriteLine($"Spin {spinNumber}:");
-                spinDelegate(ref energyLevel, ref winningProbability);
-                Console.WriteLine($"Energy Level: {energyLevel}, Winning Probability: {winningProbability}%");
+                Game game = new Game();
+                GameProbability GamePro = new GameProbability(game.Players);
+                GamePro();
+                Console.ReadKey();
             }
-
-            Console.WriteLine("\nGame Over!");
-
-            // Determine the game result
-            if (energyLevel >= 4 && winningProbability > 60)
-            {
-                Console.WriteLine($"Winner: {playerName}");
-            }
-            else if (energyLevel >= 1 && winningProbability > 50)
-            {
-                Console.WriteLine($"Runner Up: {playerName}");
-            }
-            else
-            {
-                Console.WriteLine($"Looser: {playerName}");
-            }
-            Console.ReadKey();
         }
     }
 }
